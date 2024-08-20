@@ -23,12 +23,10 @@ library(reshape2)
 if(!dir.exists(here("data", "raw"))) stop("Please place the industry surveillance datasets in a new subfolder of the \"data\" folder, named \"raw\"")
 
 #industry
-df_ATLAS <- read.csv(here("data", "raw", "2023_06_15 atlas_antibiotics.csv"))
-df_SIDERO <- read_excel(here("data", "raw", "Updated_Shionogi Five year SIDERO-WT Surveillance data(without strain number)_Vivli_220409.xlsx"))
-df_DREAM <- read_excel(here("data", "raw", "BEDAQUILINE DREAM DATASET FOR VIVLI - 06-06-2022.xlsx"))
-df_GEARS <- read_excel(here("data", "raw", "Venatorx surveillance data for Vivli 27Feb2023.xlsx"))
-df_SOAR <- read.csv(here("data", "raw", "gsk_201818_published.csv"))
-df_KEYSTONE <- read_excel(here("data", "raw", "Omadacycline_2014_to_2022_Surveillance_data.xlsx"))
+df_ATLAS <- read.csv(here("data", "raw", "ATLAS.csv"))
+df_SIDERO <- read_excel(here("data", "raw", "SIDERO.xlsx"))
+df_GEARS <- read_excel(here("data", "raw", "GEARS.xlsx"))
+df_KEYSTONE <- read_excel(here("data", "raw", "KEYSTONE.xlsx"))
 
 #public
 #I'm doing some GLASS reformatting here already, easier than doing it later
@@ -61,15 +59,35 @@ years_of_interest = c() #c(2017:2020)
 
 #Bacterial species 
 #E. coli & K. pneumoniae --> not in DREAM and SOARE
-# bacteria_of_interest = as.mo(c("E. coli", "K pneumoniae"))
+bacteria_of_interest = as.mo(c("E. coli", "K pneumoniae"))
 # bacteria_of_interest = as.mo(c("Salmonella spp"))
-bacteria_of_interest = as.mo(unique(df_GLASS$PathogenName))[-4]
+# bacteria_of_interest = as.mo(c("Acinetobacter baumannii","Enterobacter cloacae","Enterococcus faecalis","Escherichia coli",        
+#                                "Klebsiella pneumoniae","Proteus mirabilis","Pseudomonas aeruginosa","Salmonella",         
+#                                "Serratia marcescens","Staphylococcus aureus","Streptococcus agalactiae","Streptococcus pneumoniae"))
 
 #Antibiotics tested
 #ESBL (3GC) and carbapenems (CBP)
 # antibiotics_of_interest = as.ab(c("Ceftazidime", "Ceftriaxone", "Imipenem", "Meropenem"))
 # antibiotics_of_interest = as.ab(c("Colistin", "Gentamicin", "Imipenem", "Meropenem"))
-antibiotics_of_interest = c() #as.ab(unique(df_GLASS$AbTargets))
+# antibiotics_of_interest = as.ab(c("Amikacin","Cefepime","Ceftazidime",                  
+#                                 "Ceftriaxone","Colistin","Gentamicin",                   
+#                                 "Imipenem","Levofloxacin","Meropenem",                    
+#                                 "Minocycline","Piperacillin/tazobactam","Tigecycline",                  
+#                                 "Amoxicillin/clavulanic acid","Ampicillin","Benzylpenicillin",             
+#                                 "Daptomycin","Linezolid","Tetracycline",                 
+#                                 "Vancomycin","Ampicillin/sulbactam","Aztreonam",                    
+#                                 "Cefiderocol","Cefotaxime","Ceftaroline",                  
+#                                 "Ceftazidime/avibactam","Ceftolozane/tazobactam","Ciprofloxacin",                
+#                                 "Doripenem","Doxycycline","Ertapenem",                    
+#                                 "Meropenem/vaborbactam","Trimethoprim/sulfamethoxazole","Clindamycin",                  
+#                                 "Erythromycin","Moxifloxacin","Oxacillin",                    
+#                                 "Teicoplanin","Amoxicillin","Azithromycin",                 
+#                                 "Cefaclor","Cefuroxime","Clarithromycin"))
+antibiotics_of_interest = as.ab(c("Ampicillin", "Cefepime", "Cefotaxime", "Ceftazidime",
+                                  "Ceftriaxone", "Ciprofloxacin", "Co-trimoxazole",
+                                  "Colistin", "Ertapenem", "Imipenem", "Levofloxacin",
+                                  "Meropenem", "Nitrofurantoin", "Amoxicillin/clavulanic acid",
+                                  "Piperacillin/tazobactam", "Fosfomycin", "Gentamicin", "Amikacin"))
 
 
 
@@ -78,7 +96,7 @@ antibiotics_of_interest = c() #as.ab(unique(df_GLASS$AbTargets))
 ################################################################################
 
 #### ATLAS ####
-df_ATLAS_2 = df_ATLAS[,-c(104:126)]
+df_ATLAS_2 = df_ATLAS[,-c(112:135)]
 df_ATLAS_2 <- df_ATLAS_2[,c(grep(pattern = "_I", colnames(df_ATLAS_2), invert=T))]
 # MRSA harmonisation - MRSA status indicated by "MRSA" label in Phenotype, not necessarily oxa MIC
 # so, set all MRSA phenotypes to have oxa MIC of 8
@@ -346,61 +364,6 @@ for(i in 1:nrow(source_index)){
 
 #####
 
-#### SOAR ####
-df_SOAR_2 <- df_SOAR[,c(5,8,2,10,9,6,11:23)]
-colnames(df_SOAR_2)[-c(1:6)] = as.ab(colnames(df_SOAR_2)[-c(1:6)])
-df_SOAR_2$ORGANISMNAME = as.mo(df_SOAR_2$ORGANISMNAME)
-# no MRSA here so no harmonisation needed
-
-#get antibiotics
-if(!(all(is.na(antibiotics_of_interest)))) df_SOAR_2 <- df_SOAR_2[,c(1:6, which(colnames(df_SOAR_2) %in% antibiotics_of_interest))]
-#get bacteria
-if(!(all(is.na(bacteria_of_interest)))) df_SOAR_2 <- df_SOAR_2 %>% filter(ORGANISMNAME %in% bacteria_of_interest)
-#get years
-if(length(years_of_interest) != 0) df_SOAR_2 <- df_SOAR_2 %>% filter(YEARCOLLECTED %in% years_of_interest)
-
-if(nrow(df_SOAR_2) > 0){
-  #format resistances
-  df_SOAR_2 = df_SOAR_2 %>%
-    mutate_at(vars(-COUNTRY, -GENDER, -AGE, -BODYLOCATION, -YEARCOLLECTED, -ORGANISMNAME), as.mic)
-  df_SOAR_2 = df_SOAR_2[,which(apply(df_SOAR_2, 2, function(x) !(all(is.na(x)))))]
-  
-  df_SOAR_2b = df_SOAR_2 %>%
-    mutate_if(is.mic, as.sir, mo = .$ORGANISMNAME, guideline = "CLSI")
-  
-  if(any(apply(df_SOAR_2b, 2, function(x) all(is.na(x))))){
-    cat("\nRetrying some columns with EUCAST guidelines...\n")
-    to_retry = which(apply(df_SOAR_2b, 2, function(x) all(is.na(x))))
-    df_SOAR_2b[,to_retry] = df_SOAR_2 %>%
-      select(all_of(c(6,to_retry))) %>%
-      mutate_if(is.mic, as.sir, mo = .$ORGANISMNAME, guideline = "EUCAST") %>%
-      select(-1)
-  }
-  df_SOAR_2 = df_SOAR_2b
-  rm(df_SOAR_2b)
-  
-}
-
-df_SOAR_2$BODYLOCATION = str_to_lower(df_SOAR_2$BODYLOCATION)
-for(i in 1:nrow(source_index)){
-  df_SOAR_2$BODYLOCATION[str_which(df_SOAR_2$BODYLOCATION, source_index$contains[i])] = source_index$match[i]
-}
-
-
-df_SOAR_2$AGE[df_SOAR_2$AGE %in% c(0:18)] = 0
-df_SOAR_2$AGE[df_SOAR_2$AGE %in% c(19:64)] = 19
-df_SOAR_2$AGE[df_SOAR_2$AGE %in% c(65:150)] = 65
-
-df_SOAR_2$AGE[df_SOAR_2$AGE %in% c(-1)] = "Unknown"
-df_SOAR_2$AGE[df_SOAR_2$AGE %in% c(0)] = "0 to 18 Years"
-df_SOAR_2$AGE[df_SOAR_2$AGE %in% c(19)] = "19 to 64 Years"
-df_SOAR_2$AGE[df_SOAR_2$AGE %in% c(65)] = "65 and Over"
-
-df_SOAR_2$GENDER[df_SOAR_2$GENDER == ""] = "Unknown"
-
-#####
-
-
 #### GLASS ####
 df_GLASS_2 <- df_GLASS[,c("CountryTerritoryArea", "Year", "Specimen", "PathogenName", "AbTargets", "InterpretableAST", "Resistant")]
 
@@ -520,32 +483,6 @@ if(nrow(df_SIDERO_2) > 0 & !(all(is.na(df_SIDERO_2)[,-c(1:6)]))){
 
 #####  
 
-
-#### SOAR ####
-
-if(nrow(df_SOAR_2) > 0 & !(all(is.na(df_SOAR_2)[,-c(1:6)]))){
-  df_SOAR_3 = df_SOAR_2 %>%
-    melt(id.vars = c("COUNTRY", "YEARCOLLECTED", "ORGANISMNAME", "GENDER", "AGE", "BODYLOCATION")) %>%
-    mutate(value = as.sir(value)) %>%
-    filter(!is.na(value)) %>%
-    group_by(COUNTRY, YEARCOLLECTED, ORGANISMNAME, GENDER, AGE, BODYLOCATION, variable, .drop = FALSE) %>%
-    summarise(Total = n(), Resistant = count_resistant(value)) %>%
-    ungroup %>%
-    rename(Pathogen = ORGANISMNAME,
-           Antibiotic = variable,
-           Year = YEARCOLLECTED,
-           Country = COUNTRY,
-           Gender = GENDER,
-           Age = AGE,
-           Source = BODYLOCATION) %>%
-    select(all_of(final_column_names))
-  
-  ## Add dataset name
-  df_SOAR_3$Data <- 'SOAR'
-} else df_SOAR_3 = data.frame()
-
-#####  
-
 #### GLASS ####
 
 if(nrow(df_GLASS_2) > 0){
@@ -569,8 +506,7 @@ df_AMR <- rbind(df_GLASS_3,
                 df_ATLAS_3,
                 df_GEARS_3,
                 df_KEYSTONE_3,
-                df_SIDERO_3,
-                df_SOAR_3)
+                df_SIDERO_3)
 
 if(nrow(df_AMR) == 0){
   cat("The requested year-drug-bug combination does not exist in any dataset!\n")
@@ -580,8 +516,7 @@ if(nrow(df_AMR) == 0){
                    "df_ATLAS_3",
                    "df_GEARS_3",
                    "df_KEYSTONE_3",
-                   "df_SIDERO_3",
-                   "df_SOAR_3")){
+                   "df_SIDERO_3")){
     if(nrow(get(dataset)) == 0) cat("The requested year-drug-bug combination does not exist in",
                                     strsplit(dataset, "_")[[1]][2], "\n")
   }
@@ -645,12 +580,4 @@ if(nrow(df_AMR) == 0){
             row.names = F)
   
 }
-
-
-
-
-
-
-
-
 
