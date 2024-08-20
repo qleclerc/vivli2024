@@ -50,5 +50,5 @@ po/*~
 rsconnect/
 
 # raw data
-data/raw
+#data/raw
 data/final_AMR_dataset.csv
