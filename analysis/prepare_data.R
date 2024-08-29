@@ -16,6 +16,122 @@ library(here)
 library(AMR)
 library(reshape2)
 
+# helper function to define class resistance
+class_resistance = function(dataset){
+  
+  # Fluoroquinolones
+  
+  cnames = c("CIP", "LVX", "OFX")
+  cnames = cnames[!cnames%in%names(dataset)]
+  if(length(cnames)!=0) dataset[cnames] = NA
+  
+  dataset = dataset %>%
+    mutate(Fluoroquinolone = CIP) %>%
+    mutate(Fluoroquinolone = ifelse(is.na(Fluoroquinolone), LVX, Fluoroquinolone)) %>%
+    mutate(Fluoroquinolone = ifelse(is.na(Fluoroquinolone), OFX, Fluoroquinolone))
+  
+  if(all(is.na(dataset$Fluoroquinolone))) warning("Fluoroquinolone not added - no susceptibility data available")
+  
+  # Aminoglycosides
+  
+  cnames = c("GEN", "TOB", "AMK", "KAN", "NET", "STR1")
+  cnames = cnames[!cnames%in%names(dataset)]
+  if(length(cnames)!=0) dataset[cnames] = NA
+  
+  dataset = dataset %>%
+    mutate(Aminoglycoside = GEN) %>%
+    mutate(Aminoglycoside = ifelse(is.na(Aminoglycoside), TOB, Aminoglycoside)) %>%
+    mutate(Aminoglycoside = ifelse(is.na(Aminoglycoside), AMK, Aminoglycoside)) %>%
+    mutate(Aminoglycoside = ifelse(is.na(Aminoglycoside), KAN, Aminoglycoside)) %>%
+    mutate(Aminoglycoside = ifelse(is.na(Aminoglycoside), NET, Aminoglycoside)) %>%
+    mutate(Aminoglycoside = ifelse(is.na(Aminoglycoside), STR1, Aminoglycoside))
+  
+  if(all(is.na(dataset$Aminoglycoside))) warning("Aminoglycoside not added - no susceptibility data available")
+  
+  # Cephalosporins_3rd
+  
+  cnames = c("CTX", "CRO", "CZO", "CDR", "CFM")
+  cnames = cnames[!cnames%in%names(dataset)]
+  if(length(cnames)!=0) dataset[cnames] = NA
+  
+  dataset = dataset %>%
+    mutate(Cephalosporin_3rd = CTX) %>%
+    mutate(Cephalosporin_3rd = ifelse(is.na(Cephalosporin_3rd), CRO, Cephalosporin_3rd)) %>%
+    mutate(Cephalosporin_3rd = ifelse(is.na(Cephalosporin_3rd), CZO, Cephalosporin_3rd)) %>%
+    mutate(Cephalosporin_3rd = ifelse(is.na(Cephalosporin_3rd), CDR, Cephalosporin_3rd)) %>%
+    mutate(Cephalosporin_3rd = ifelse(is.na(Cephalosporin_3rd), CFM, Cephalosporin_3rd))
+  
+  if(all(is.na(dataset$Cephalosporin_3rd))) warning("Cephalosporin_3rd not added - no susceptibility data available")
+  
+  # Carbapenems
+  
+  cnames = c("IPM", "MEM", "ETP")
+  cnames = cnames[!cnames%in%names(dataset)]
+  if(length(cnames)!=0) dataset[cnames] = NA
+  
+  dataset = dataset %>%
+    mutate(Carbapenem = IPM) %>%
+    mutate(Carbapenem = ifelse(is.na(Carbapenem), MEM, Carbapenem)) %>%
+    mutate(Carbapenem = ifelse(is.na(Carbapenem), ETP, Carbapenem))
+  
+  if(all(is.na(dataset$Carbapenem))) warning("Carbapenem not added - no susceptibility data available")
+  
+  # Cephalosporins_4th
+  
+  cnames = c("FEP")
+  cnames = cnames[!cnames%in%names(dataset)]
+  if(length(cnames)!=0) dataset[cnames] = NA
+  
+  dataset = dataset %>%
+    mutate(Cephalosporin_4th = FEP) 
+  
+  if(all(is.na(dataset$Cephalosporin_4th))) warning("Cephalosporin_4th not added - no susceptibility data available")
+  
+  # Antipseudo_penicillins
+  
+  cnames = c("AMC", "SAM")
+  cnames = cnames[!cnames%in%names(dataset)]
+  if(length(cnames)!=0) dataset[cnames] = NA
+  
+  dataset = dataset %>%
+    mutate(Antipseudo_penicillin = AMC) %>%
+    mutate(Antipseudo_penicillin = ifelse(is.na(Antipseudo_penicillin), SAM, Antipseudo_penicillin))
+  
+  if(all(is.na(dataset$Antipseudo_penicillin))) warning("Antipseudo_penicillin not added - no susceptibility data available")
+  
+  # Sulpha
+  
+  cnames = c("SXT", "SSS")
+  cnames = cnames[!cnames%in%names(dataset)]
+  if(length(cnames)!=0) dataset[cnames] = NA
+  
+  dataset = dataset %>%
+    mutate(Sulpha = SXT) %>%
+    mutate(Sulpha = ifelse(is.na(Sulpha), SSS, Sulpha))
+  
+  if(all(is.na(dataset$Sulpha))) warning("Sulpha not added - no susceptibility data available")
+  
+  # Aminopenicillins
+  
+  cnames = c("AMP", "AMX", "PIP", "MEC")
+  cnames = cnames[!cnames%in%names(dataset)]
+  if(length(cnames)!=0) dataset[cnames] = NA
+  
+  dataset = dataset %>%
+    mutate(Aminopenicillin = AMP) %>%
+    mutate(Aminopenicillin = ifelse(is.na(Aminopenicillin), AMX, Aminopenicillin)) %>%
+    mutate(Aminopenicillin = ifelse(is.na(Aminopenicillin), PIP, Aminopenicillin)) %>%
+    mutate(Aminopenicillin = ifelse(is.na(Aminopenicillin), MEC, Aminopenicillin))
+  
+  if(all(is.na(dataset$Aminopenicillin))) warning("Aminopenicillin not added - no susceptibility data available")
+  
+  # remove added columns with only NA
+  dataset = dataset[, !apply(dataset, 2, function(x) all(is.na(x)))]
+  
+  return(dataset)
+}
+
+
 ################################################################################
 ########################### Load AMR datasets ##################################
 ################################################################################
@@ -58,37 +174,17 @@ source_index = read_xlsx(here::here("data", "source_index.xlsx"), skip=3)
 years_of_interest = c() #c(2017:2020)
 
 #Bacterial species 
-#E. coli & K. pneumoniae --> not in DREAM and SOARE
+# bacteria_of_interest = c()
 bacteria_of_interest = as.mo(c("E. coli", "K pneumoniae"))
-# bacteria_of_interest = as.mo(c("Salmonella spp"))
-# bacteria_of_interest = as.mo(c("Acinetobacter baumannii","Enterobacter cloacae","Enterococcus faecalis","Escherichia coli",        
-#                                "Klebsiella pneumoniae","Proteus mirabilis","Pseudomonas aeruginosa","Salmonella",         
-#                                "Serratia marcescens","Staphylococcus aureus","Streptococcus agalactiae","Streptococcus pneumoniae"))
 
 #Antibiotics tested
 #ESBL (3GC) and carbapenems (CBP)
-# antibiotics_of_interest = as.ab(c("Ceftazidime", "Ceftriaxone", "Imipenem", "Meropenem"))
-# antibiotics_of_interest = as.ab(c("Colistin", "Gentamicin", "Imipenem", "Meropenem"))
-# antibiotics_of_interest = as.ab(c("Amikacin","Cefepime","Ceftazidime",                  
-#                                 "Ceftriaxone","Colistin","Gentamicin",                   
-#                                 "Imipenem","Levofloxacin","Meropenem",                    
-#                                 "Minocycline","Piperacillin/tazobactam","Tigecycline",                  
-#                                 "Amoxicillin/clavulanic acid","Ampicillin","Benzylpenicillin",             
-#                                 "Daptomycin","Linezolid","Tetracycline",                 
-#                                 "Vancomycin","Ampicillin/sulbactam","Aztreonam",                    
-#                                 "Cefiderocol","Cefotaxime","Ceftaroline",                  
-#                                 "Ceftazidime/avibactam","Ceftolozane/tazobactam","Ciprofloxacin",                
-#                                 "Doripenem","Doxycycline","Ertapenem",                    
-#                                 "Meropenem/vaborbactam","Trimethoprim/sulfamethoxazole","Clindamycin",                  
-#                                 "Erythromycin","Moxifloxacin","Oxacillin",                    
-#                                 "Teicoplanin","Amoxicillin","Azithromycin",                 
-#                                 "Cefaclor","Cefuroxime","Clarithromycin"))
 antibiotics_of_interest = as.ab(c("Ampicillin", "Cefepime", "Cefotaxime", "Ceftazidime",
                                   "Ceftriaxone", "Ciprofloxacin", "Co-trimoxazole",
                                   "Colistin", "Ertapenem", "Imipenem", "Levofloxacin",
                                   "Meropenem", "Nitrofurantoin", "Amoxicillin/clavulanic acid",
                                   "Piperacillin/tazobactam", "Fosfomycin", "Gentamicin", "Amikacin"))
-
+# antibiotics_of_interest = c()
 
 
 ################################################################################
@@ -96,7 +192,7 @@ antibiotics_of_interest = as.ab(c("Ampicillin", "Cefepime", "Cefotaxime", "Cefta
 ################################################################################
 
 #### ATLAS ####
-df_ATLAS_2 = df_ATLAS[,-c(112:135)]
+df_ATLAS_2 = df_ATLAS[,-c(112:135, 108)] #col 108 is ceftibuten avibactam, removing otherwise picked up as dup of ceftibuten, pre clinical anyways
 df_ATLAS_2 <- df_ATLAS_2[,c(grep(pattern = "_I", colnames(df_ATLAS_2), invert=T))]
 # MRSA harmonisation - MRSA status indicated by "MRSA" label in Phenotype, not necessarily oxa MIC
 # so, set all MRSA phenotypes to have oxa MIC of 8
@@ -156,6 +252,8 @@ df_ATLAS_2$Age.Group[df_ATLAS_2$Age.Group %in% c("65 to 84 Years", "85 and Over"
 df_ATLAS_2$Gender = str_sub(df_ATLAS_2$Gender, 1, 1)
 df_ATLAS_2$Gender[df_ATLAS_2$Gender == ""] = "Unknown"
 
+df_ATLAS_2 = class_resistance(df_ATLAS_2)
+
 #####
 
 #### GEARS ####
@@ -212,6 +310,8 @@ df_GEARS_2$Age[df_GEARS_2$Age %in% c(19)] = "19 to 64 Years"
 df_GEARS_2$Age[df_GEARS_2$Age %in% c(65)] = "65 and Over"
 
 df_GEARS_2$Gender[df_GEARS_2$Gender == "N"] = "Unknown"
+
+df_GEARS_2 = class_resistance(df_GEARS_2)
 
 #####
 
@@ -309,6 +409,8 @@ df_KEYSTONE_2$Age_group[df_KEYSTONE_2$Age_group %in% c(65)] = "65 and Over"
 
 df_KEYSTONE_2$Gender[is.na(df_KEYSTONE_2$Gender)] = "Unknown"
 
+df_KEYSTONE_2 = class_resistance(df_KEYSTONE_2)
+
 #####
 
 #### SIDERO ####
@@ -362,6 +464,8 @@ for(i in 1:nrow(source_index)){
   df_SIDERO_2$`Body Location`[str_which(df_SIDERO_2$`Body Location`, source_index$contains[i])] = source_index$match[i]
 }
 
+df_SIDERO_2 = class_resistance(df_SIDERO_2)
+
 #####
 
 #### GLASS ####
@@ -409,6 +513,7 @@ if(nrow(df_ATLAS_2) > 0 & !(all(is.na(df_ATLAS_2)[,-c(1:6)]))){
     rename(Pathogen = Species,
            Antibiotic = variable,
            Age = Age.Group) %>%
+    mutate(Antibiotic = as.character(Antibiotic)) %>%
     select(all_of(final_column_names))
   
   ## Add dataset name
@@ -430,6 +535,7 @@ if(nrow(df_GEARS_2) > 0 & !(all(is.na(df_GEARS_2)[,-c(1:6)]))){
     rename(Pathogen = Organism,
            Antibiotic = variable,
            Source = BodySite) %>%
+    mutate(Antibiotic = as.character(Antibiotic)) %>%
     select(all_of(final_column_names))
   
   ## Add dataset name
@@ -453,6 +559,7 @@ if(nrow(df_KEYSTONE_2) > 0 & !(all(is.na(df_KEYSTONE_2)[,-c(1:6)]))){
            Year = `Study Year`,
            Age = Age_group,
            Source = `Infection Type`) %>%
+    mutate(Antibiotic = as.character(Antibiotic)) %>%
     select(all_of(final_column_names))
   
   ## Add dataset name
@@ -475,6 +582,7 @@ if(nrow(df_SIDERO_2) > 0 & !(all(is.na(df_SIDERO_2)[,-c(1:6)]))){
            Antibiotic = variable,
            Year = `Year Collected`,
            Source = `Body Location`) %>%
+    mutate(Antibiotic = as.character(Antibiotic)) %>%
     select(all_of(final_column_names))
   
   ## Add dataset name
@@ -487,9 +595,9 @@ if(nrow(df_SIDERO_2) > 0 & !(all(is.na(df_SIDERO_2)[,-c(1:6)]))){
 
 if(nrow(df_GLASS_2) > 0){
   df_GLASS_3 = df_GLASS_2
-  #name
   colnames(df_GLASS_3) <- final_column_names
-  
+  df_GLASS_3$Antibiotic = as.character(df_GLASS_3$Antibiotic)
+    
   ## Add dataset name
   df_GLASS_3$Data <- 'GLASS'
 } else df_GLASS_3 = data.frame()
