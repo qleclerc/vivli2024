@@ -308,6 +308,7 @@ df_GEARS_2$Age[df_GEARS_2$Age %in% c(-1)] = "Unknown"
 df_GEARS_2$Age[df_GEARS_2$Age %in% c(0)] = "0 to 18 Years"
 df_GEARS_2$Age[df_GEARS_2$Age %in% c(19)] = "19 to 64 Years"
 df_GEARS_2$Age[df_GEARS_2$Age %in% c(65)] = "65 and Over"
+df_GEARS_2$Age[df_GEARS_2$Age %in% "NG"] = "Unknown"
 
 df_GEARS_2$Gender[df_GEARS_2$Gender == "N"] = "Unknown"
 
