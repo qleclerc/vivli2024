@@ -50,13 +50,12 @@ class_resistance = function(dataset){
   
   # Cephalosporins_3rd
   
-  cnames = c("CTX", "CRO", "CZO", "CDR", "CFM")
+  cnames = c("CRO", "CZO", "CDR", "CFM")
   cnames = cnames[!cnames%in%names(dataset)]
   if(length(cnames)!=0) dataset[cnames] = NA
   
   dataset = dataset %>%
-    mutate(Cephalosporin_3rd = CTX) %>%
-    mutate(Cephalosporin_3rd = ifelse(is.na(Cephalosporin_3rd), CRO, Cephalosporin_3rd)) %>%
+    mutate(Cephalosporin_3rd = CRO) %>%
     mutate(Cephalosporin_3rd = ifelse(is.na(Cephalosporin_3rd), CZO, Cephalosporin_3rd)) %>%
     mutate(Cephalosporin_3rd = ifelse(is.na(Cephalosporin_3rd), CDR, Cephalosporin_3rd)) %>%
     mutate(Cephalosporin_3rd = ifelse(is.na(Cephalosporin_3rd), CFM, Cephalosporin_3rd))
@@ -65,14 +64,13 @@ class_resistance = function(dataset){
   
   # Carbapenems
   
-  cnames = c("IPM", "MEM", "ETP")
+  cnames = c("IPM", "MEM")
   cnames = cnames[!cnames%in%names(dataset)]
   if(length(cnames)!=0) dataset[cnames] = NA
   
   dataset = dataset %>%
     mutate(Carbapenem = IPM) %>%
-    mutate(Carbapenem = ifelse(is.na(Carbapenem), MEM, Carbapenem)) %>%
-    mutate(Carbapenem = ifelse(is.na(Carbapenem), ETP, Carbapenem))
+    mutate(Carbapenem = ifelse(is.na(Carbapenem), MEM, Carbapenem))
   
   if(all(is.na(dataset$Carbapenem))) warning("Carbapenem not added - no susceptibility data available")
   
@@ -179,11 +177,11 @@ bacteria_of_interest = as.mo(c("E. coli", "K pneumoniae"))
 
 #Antibiotics tested
 #ESBL (3GC) and carbapenems (CBP)
-antibiotics_of_interest = as.ab(c("Ampicillin", "Cefepime", "Cefotaxime", "Ceftazidime",
+antibiotics_of_interest = as.ab(c("Ampicillin", "Cefepime", "Ceftazidime",
                                   "Ceftriaxone", "Ciprofloxacin", "Co-trimoxazole",
-                                  "Colistin", "Ertapenem", "Imipenem", "Levofloxacin",
-                                  "Meropenem", "Nitrofurantoin", "Amoxicillin/clavulanic acid",
-                                  "Piperacillin/tazobactam", "Fosfomycin", "Gentamicin", "Amikacin"))
+                                  "Colistin", "Imipenem", "Levofloxacin",
+                                  "Meropenem", "Amoxicillin/clavulanic acid",
+                                  "Piperacillin/tazobactam", "Gentamicin", "Amikacin"))
 # antibiotics_of_interest = c()
 
 
