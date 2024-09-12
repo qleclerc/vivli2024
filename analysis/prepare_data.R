@@ -50,27 +50,29 @@ class_resistance = function(dataset){
   
   # Cephalosporins_3rd
   
-  cnames = c("CRO", "CZO", "CDR", "CFM")
+  cnames = c("CTX", "CRO", "CZO", "CDR", "CPD")
   cnames = cnames[!cnames%in%names(dataset)]
   if(length(cnames)!=0) dataset[cnames] = NA
   
   dataset = dataset %>%
-    mutate(Cephalosporin_3rd = CRO) %>%
+    mutate(Cephalosporin_3rd = CTX) %>%
+    mutate(Cephalosporin_3rd = ifelse(is.na(Cephalosporin_3rd), CRO, Cephalosporin_3rd)) %>%
     mutate(Cephalosporin_3rd = ifelse(is.na(Cephalosporin_3rd), CZO, Cephalosporin_3rd)) %>%
     mutate(Cephalosporin_3rd = ifelse(is.na(Cephalosporin_3rd), CDR, Cephalosporin_3rd)) %>%
-    mutate(Cephalosporin_3rd = ifelse(is.na(Cephalosporin_3rd), CFM, Cephalosporin_3rd))
+    mutate(Cephalosporin_3rd = ifelse(is.na(Cephalosporin_3rd), CPD, Cephalosporin_3rd))
   
   if(all(is.na(dataset$Cephalosporin_3rd))) warning("Cephalosporin_3rd not added - no susceptibility data available")
   
   # Carbapenems
   
-  cnames = c("IPM", "MEM")
+  cnames = c("IPM", "MEM", "ETP")
   cnames = cnames[!cnames%in%names(dataset)]
   if(length(cnames)!=0) dataset[cnames] = NA
   
   dataset = dataset %>%
     mutate(Carbapenem = IPM) %>%
-    mutate(Carbapenem = ifelse(is.na(Carbapenem), MEM, Carbapenem))
+    mutate(Carbapenem = ifelse(is.na(Carbapenem), MEM, Carbapenem)) %>%
+    mutate(Carbapenem = ifelse(is.na(Carbapenem), ETP, Carbapenem))
   
   if(all(is.na(dataset$Carbapenem))) warning("Carbapenem not added - no susceptibility data available")
   
@@ -85,29 +87,29 @@ class_resistance = function(dataset){
   
   if(all(is.na(dataset$Cephalosporin_4th))) warning("Cephalosporin_4th not added - no susceptibility data available")
   
-  # Antipseudo_penicillins
+  # # Antipseudo_penicillins
+  # 
+  # cnames = c("AMC", "SAM")
+  # cnames = cnames[!cnames%in%names(dataset)]
+  # if(length(cnames)!=0) dataset[cnames] = NA
+  # 
+  # dataset = dataset %>%
+  #   mutate(Antipseudo_penicillin = AMC) %>%
+  #   mutate(Antipseudo_penicillin = ifelse(is.na(Antipseudo_penicillin), SAM, Antipseudo_penicillin))
+  # 
+  # if(all(is.na(dataset$Antipseudo_penicillin))) warning("Antipseudo_penicillin not added - no susceptibility data available")
   
-  cnames = c("AMC", "SAM")
-  cnames = cnames[!cnames%in%names(dataset)]
-  if(length(cnames)!=0) dataset[cnames] = NA
-  
-  dataset = dataset %>%
-    mutate(Antipseudo_penicillin = AMC) %>%
-    mutate(Antipseudo_penicillin = ifelse(is.na(Antipseudo_penicillin), SAM, Antipseudo_penicillin))
-  
-  if(all(is.na(dataset$Antipseudo_penicillin))) warning("Antipseudo_penicillin not added - no susceptibility data available")
-  
-  # Sulpha
+  # Sulfonamide
   
   cnames = c("SXT", "SSS")
   cnames = cnames[!cnames%in%names(dataset)]
   if(length(cnames)!=0) dataset[cnames] = NA
   
   dataset = dataset %>%
-    mutate(Sulpha = SXT) %>%
-    mutate(Sulpha = ifelse(is.na(Sulpha), SSS, Sulpha))
+    mutate(Sulfonamide_c = SXT) %>%
+    mutate(Sulfonamide_c = ifelse(is.na(Sulfonamide_c), SSS, Sulfonamide_c))
   
-  if(all(is.na(dataset$Sulpha))) warning("Sulpha not added - no susceptibility data available")
+  if(all(is.na(dataset$Sulfonamide_c))) warning("Sulfonamide not added - no susceptibility data available")
   
   # Aminopenicillins
   
@@ -122,6 +124,17 @@ class_resistance = function(dataset){
     mutate(Aminopenicillin = ifelse(is.na(Aminopenicillin), MEC, Aminopenicillin))
   
   if(all(is.na(dataset$Aminopenicillin))) warning("Aminopenicillin not added - no susceptibility data available")
+  
+  # Polypeptides
+  
+  cnames = c("COL")
+  cnames = cnames[!cnames%in%names(dataset)]
+  if(length(cnames)!=0) dataset[cnames] = NA
+  
+  dataset = dataset %>%
+    mutate(Polypeptide = COL) 
+  
+  if(all(is.na(dataset$Polypeptide))) warning("Polypeptide not added - no susceptibility data available")
   
   # remove added columns with only NA
   dataset = dataset[, !apply(dataset, 2, function(x) all(is.na(x)))]
@@ -177,13 +190,14 @@ bacteria_of_interest = as.mo(c("E. coli", "K pneumoniae"))
 
 #Antibiotics tested
 #ESBL (3GC) and carbapenems (CBP)
-antibiotics_of_interest = as.ab(c("Ampicillin", "Cefepime", "Ceftazidime",
-                                  "Ceftriaxone", "Ciprofloxacin", "Co-trimoxazole",
-                                  "Colistin", "Imipenem", "Levofloxacin",
-                                  "Meropenem", "Amoxicillin/clavulanic acid",
-                                  "Piperacillin/tazobactam", "Gentamicin", "Amikacin"))
+antibiotics_of_interest = as.ab(c("ciprofloxacin", "levofloxacin", "ofloxacin", 
+                                  "gentamicin", "tobramycin", "amikacin", "kanamycin",
+                                  "netilmicin", "streptomycin", "cefotaxime", "ceftriaxone", 
+                                  "cefazolin", "cefdinir", "cefpodoxime",
+                                  "imipenem", "meropenem", "ertapenem", "cefepime",
+                                  "trimethoprim-sulfamethoxazole", "sulfonamides", "ampicillin", "amoxicillin", "piperacillin", "mecillinam",
+                                  "colistin"))
 # antibiotics_of_interest = c()
-
 
 ################################################################################
 ############### Get same variables for all AMR datasets ########################
@@ -671,6 +685,57 @@ if(nrow(df_AMR) == 0){
   df_AMR$Antibiotic = as.character(df_AMR$Antibiotic)
   df_AMR$Antibiotic[nchar(df_AMR$Antibiotic) == 3] = ab_name(as.ab(df_AMR$Antibiotic[nchar(df_AMR$Antibiotic) == 3]))
   df_AMR$Pathogen = mo_name(as.mo(df_AMR$Pathogen))
+  
+  ## Add missing WHO regions
+  
+  df_AMR = df_AMR %>%
+    mutate(Region = replace(Region, Region =="South-East Asia Region", "South-East Asian Region")) %>% 
+    mutate(Region = replace(Region, Country =="USA", "Region of the Americas")) %>% 
+    mutate(Region = replace(Region, Country =="Canada", "Region of the Americas")) %>% 
+    mutate(Region = replace(Region, Country =="Chile", "Region of the Americas")) %>% 
+    mutate(Region = replace(Region, Country =="Spain", "European Region")) %>% 
+    mutate(Region = replace(Region, Country =="Turkey", "European Region")) %>% 
+    mutate(Region = replace(Region, Country =="Belgium", "European Region")) %>% 
+    mutate(Region = replace(Region, Country =="Bulgaria", "European Region")) %>% 
+    mutate(Region = replace(Region, Country =="Hungary", "European Region")) %>% 
+    mutate(Region = replace(Region, Country =="Slovenia", "European Region")) %>% 
+    mutate(Region = replace(Region, Country =="Romania", "European Region")) %>% 
+    mutate(Region = replace(Region, Country =="Portugal", "European Region")) %>% 
+    mutate(Region = replace(Region, Country =="Israel", "Eastern Mediterranean Region")) %>% 
+    mutate(Region = replace(Region, Country =="Denmark", "European Region")) %>% 
+    mutate(Region = replace(Region, Country =="Belarus", "European Region")) %>% 
+    mutate(Region = replace(Region, Country =="Venezuela", "Region of the Americas")) %>% 
+    mutate(Region = replace(Region, Country =="Ukraine", "European Region")) %>% 
+    mutate(Region = replace(Region, Country =="Taiwan", "Western Pacific Region")) %>% 
+    mutate(Region = replace(Region, Country =="Panama", "Region of the Americas")) %>% 
+    mutate(Region = replace(Region, Country =="Nigeria", "African Region")) %>% 
+    mutate(Region = replace(Region, Country =="Morocco", "Eastern Mediterranean Region")) %>% 
+    mutate(Region = replace(Region, Country =="Mexico", "Region of the Americas")) %>% 
+    mutate(Region = replace(Region, Country =="Kuwait", "Eastern Mediterranean Region")) %>% 
+    mutate(Region = replace(Region, Country =="Guatemala", "Region of the Americas")) %>% 
+    mutate(Region = replace(Region, Country =="Dominican Republic", "Region of the Americas")) %>% 
+    mutate(Region = replace(Region, Country =="Costa Rica", "Region of the Americas")) %>% 
+    mutate(Region = replace(Region, Country =="Colombia", "Region of the Americas")) %>% 
+    mutate(Region = replace(Region, Country =="Venezuela", "Region of the Americas")) %>% 
+    mutate(Region = replace(Region, Country =="Vietnam", "Western Pacific Region")) %>% 
+    mutate(Region = replace(Region, Country =="New Zealand", "Western Pacific Region")) %>% 
+    mutate(Region = replace(Region, Country =="Hong Kong", "Western Pacific Region")) %>% 
+    mutate(Region = replace(Region, Country =="Cameroon", "African Region")) %>% 
+    mutate(Region = replace(Region, Country =="China", "Western Pacific Region")) %>% 
+    mutate(Region = replace(Region, Country =="El Salvador", "Region of the Americas")) %>% 
+    mutate(Region = replace(Region, Country =="Honduras", "Region of the Americas")) %>% 
+    mutate(Region = replace(Region, Country =="Slovakia", "European Region")) %>% 
+    mutate(Region = replace(Region, Country =="Serbia", "European Region")) %>% 
+    mutate(Region = replace(Region, Country =="Puerto Rico", "Region of the Americas")) %>% 
+    mutate(Region = replace(Region, Country =="Nicaragua", "Region of the Americas")) %>% 
+    mutate(Region = replace(Region, Country =="Namibia", "African Region")) %>% 
+    mutate(Region = replace(Region, Country =="Mauritius", "African Region")) %>% 
+    mutate(Region = replace(Region, Country =="Kenya", "African Region")) %>% 
+    mutate(Region = replace(Region, Country =="Malawi", "African Region")) %>% 
+    mutate(Region = replace(Region, Country =="Ivory Coast", "African Region")) %>% 
+    mutate(Region = replace(Region, Country =="Ghana", "African Region")) %>% 
+    mutate(Region = replace(Region, Country =="Jamaica", "Region of the Americas"))
+  
   
   ## Summary
   cat("Combined datasets cover", length(unique(df_AMR$Country)), "countries\n",
