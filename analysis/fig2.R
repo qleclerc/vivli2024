@@ -218,13 +218,14 @@ colors = c("African Region" = "red",
            "Western Pacific Region" = "gold",
            "Eastern Mediterranean Region" = "orange")
 
+colors = brewer.pal(6, "Set1")
 
 # PLOT CORRELATION:
-x_y_label_e = paste0("R = ",
+x_y_label_e = paste0("r = ",
                    round(cor(x_y$p.x[x_y$Pathogen=="Escherichia coli"],
                              x_y$p.y[x_y$Pathogen=="Escherichia coli"],
                              method="kendall"), 2))
-x_y_label_k = paste0("R = ",
+x_y_label_k = paste0("r = ",
                    round(cor(x_y$p.x[x_y$Pathogen=="Klebsiella pneumoniae"],
                              x_y$p.y[x_y$Pathogen=="Klebsiella pneumoniae"],
                              method="kendall"), 2))
@@ -234,8 +235,8 @@ p1 = ggplot(x_y) +
   geom_point(aes(x = p.x, y = p.y, fill = factor(Region)), 
              pch=21, size = 1) + 
   geom_smooth(aes(x=p.x, y=p.y), method="lm", colour="black") +
-  geom_text(data=data.frame(Pathogen="Escherichia coli"), aes(x = 0.15, y=0.95, label = x_y_label_e)) +
-  geom_text(data=data.frame(Pathogen="Klebsiella pneumoniae"), aes(x = 0.15, y=0.95, label = x_y_label_k)) +
+  geom_text(data=data.frame(Pathogen="Escherichia coli"), aes(x = 0.2, y=1, label = x_y_label_e)) +
+  geom_text(data=data.frame(Pathogen="Klebsiella pneumoniae"), aes(x = 0.2, y=1, label = x_y_label_k)) +
   theme_bw() +
   theme(legend.position = "none", # "none"
         strip.text.x = element_text(size = 11, face = "italic"),
@@ -249,11 +250,11 @@ p1 = ggplot(x_y) +
        y = "Res. prop. in Gastro samples")
 
 
-x_y2_label_e = paste0("R = ",
+x_y2_label_e = paste0("r = ",
                      round(cor(x_y2$p.x[x_y2$Pathogen=="Escherichia coli"],
                                x_y2$p.y[x_y2$Pathogen=="Escherichia coli"],
                                method="kendall"), 2))
-x_y2_label_k = paste0("R = ",
+x_y2_label_k = paste0("r = ",
                      round(cor(x_y2$p.x[x_y2$Pathogen=="Klebsiella pneumoniae"],
                                x_y2$p.y[x_y2$Pathogen=="Klebsiella pneumoniae"],
                                method="kendall"), 2))
@@ -263,8 +264,8 @@ p2 = ggplot(x_y2) +
   geom_point(aes(x = p.x, y = p.y, fill = factor(Region)), 
              pch=21, size = 1) + 
   geom_smooth(aes(x=p.x, y=p.y), method="lm", colour="black") +
-  geom_text(data=data.frame(Pathogen="Escherichia coli"), aes(x = 0.15, y=0.95, label = x_y2_label_e)) +
-  geom_text(data=data.frame(Pathogen="Klebsiella pneumoniae"), aes(x = 0.15, y=0.95, label = x_y2_label_k)) +
+  geom_text(data=data.frame(Pathogen="Escherichia coli"), aes(x = 0.2, y=1, label = x_y2_label_e)) +
+  geom_text(data=data.frame(Pathogen="Klebsiella pneumoniae"), aes(x = 0.2, y=1, label = x_y2_label_k)) +
   theme_bw() +
   theme(legend.position = "none", # "none"
         strip.text.x = element_text(size = 11, face = "italic"),
@@ -277,11 +278,11 @@ p2 = ggplot(x_y2) +
   labs(x = "Res. prop. in Blood/sterile samples", 
        y = "Res. prop. in Respiratory samples")
 
-x_y3_label_e = paste0("R = ",
+x_y3_label_e = paste0("r = ",
                       round(cor(x_y3$p.x[x_y3$Pathogen=="Escherichia coli"],
                                 x_y3$p.y[x_y3$Pathogen=="Escherichia coli"],
                                 method="kendall"), 2))
-x_y3_label_k = paste0("R = ",
+x_y3_label_k = paste0("r = ",
                       round(cor(x_y3$p.x[x_y3$Pathogen=="Klebsiella pneumoniae"],
                                 x_y3$p.y[x_y3$Pathogen=="Klebsiella pneumoniae"],
                                 method="kendall"), 2))
@@ -291,8 +292,8 @@ p3 = ggplot(x_y3) +
   geom_point(aes(x = p.x, y = p.y, fill = factor(Region)), 
              pch=21, size = 1) + 
   geom_smooth(aes(x=p.x, y=p.y), method="lm", colour="black") +
-  geom_text(data=data.frame(Pathogen="Escherichia coli"), aes(x = 0.15, y=0.95, label = x_y3_label_e)) +
-  geom_text(data=data.frame(Pathogen="Klebsiella pneumoniae"), aes(x = 0.15, y=0.95, label = x_y3_label_k)) +
+  geom_text(data=data.frame(Pathogen="Escherichia coli"), aes(x = 0.2, y=1, label = x_y3_label_e)) +
+  geom_text(data=data.frame(Pathogen="Klebsiella pneumoniae"), aes(x = 0.2, y=1, label = x_y3_label_k)) +
   theme_bw() +
   theme(legend.position = "none", # "none"
         strip.text.x = element_text(size = 11, face = "italic"),
@@ -305,11 +306,11 @@ p3 = ggplot(x_y3) +
   labs(x = "Res. prop. in Blood/sterile samples", 
        y = "Res. prop. in Urine samples")
 
-x_y4_label_e = paste0("R = ",
+x_y4_label_e = paste0("r = ",
                       round(cor(x_y4$p.x[x_y4$Pathogen=="Escherichia coli"],
                                 x_y4$p.y[x_y4$Pathogen=="Escherichia coli"],
                                 method="kendall"), 2))
-x_y4_label_k = paste0("R = ",
+x_y4_label_k = paste0("r = ",
                       round(cor(x_y4$p.x[x_y4$Pathogen=="Klebsiella pneumoniae"],
                                 x_y4$p.y[x_y4$Pathogen=="Klebsiella pneumoniae"],
                                 method="kendall"), 2))
@@ -319,8 +320,8 @@ p4 = ggplot(x_y4) +
   geom_point(aes(x = p.x, y = p.y, fill = factor(Region)), 
              pch=21, size = 1) + 
   geom_smooth(aes(x=p.x, y=p.y), method="lm", colour="black") +
-  geom_text(data=data.frame(Pathogen="Escherichia coli"), aes(x = 0.15, y=0.95, label = x_y4_label_e)) +
-  geom_text(data=data.frame(Pathogen="Klebsiella pneumoniae"), aes(x = 0.15, y=0.95, label = x_y4_label_k)) +
+  geom_text(data=data.frame(Pathogen="Escherichia coli"), aes(x = 0.2, y=1, label = x_y4_label_e)) +
+  geom_text(data=data.frame(Pathogen="Klebsiella pneumoniae"), aes(x = 0.2, y=1, label = x_y4_label_k)) +
   theme_bw() +
   theme(legend.position = "bottom", # "none"
         legend.text = element_text(size=11),
@@ -347,9 +348,6 @@ df2 = df2 %>%
 
 
 corr_results_all = data.frame()
-bac=df2$Pathogen[1]
-abx=df2$Antibiotic[1]
-type="Urine"
 
 for(bac in unique(df2$Pathogen)){
   
@@ -396,7 +394,8 @@ p5 = ggplot(corr_results_all %>% filter(Source != "Blood/sterile"), aes(x=Source
 plot_grid(plot_grid(plot_grid(p1, p2, p3, p4+theme(legend.position = "none"), 
                     labels = c("a)", "b)", "c)", "d)"),
                     hjust=0, ncol = 2, nrow = 2),
-          get_plot_component(p4, "guide-box-bottom", return_all = T),
+          get_plot_component(p4+guides(fill=guide_legend(override.aes = list(size=3))),
+                             "guide-box-bottom", return_all = T),
           nrow=2, rel_heights = c(1,0.1)),
           p5+theme(legend.position="none"), labels = c("", "e)"),
           rel_widths = c(1,0.55))

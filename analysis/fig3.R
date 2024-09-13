@@ -3,6 +3,7 @@ library(ggplot2)
 library(dplyr)
 library(reshape2)
 library(cowplot)
+library(here)
 
 df_AMR = read.csv(here::here("data", "final_AMR_dataset.csv")) %>%
   filter(Data != "GLASS") %>%
@@ -11,6 +12,7 @@ df_AMR = read.csv(here::here("data", "final_AMR_dataset.csv")) %>%
   group_by(Region, Year, Source, Pathogen, Antibiotic) %>%
   summarise(Resistant = sum(Resistant),
             Total = sum(Total)) %>%
+  filter(Total >= 10) %>%
   mutate(prop = Resistant/Total) %>%
   filter(!(is.nan(prop))) %>%
   filter(prop > 0) %>%
@@ -68,31 +70,49 @@ for(bug in unique(df_for_reg$Pathogen)){
   }
 }
 
+results_all$Estimate = exp(results_all$Estimate)
 
-ggplot(results_all %>% filter(Value=="Resistant.x" & pval < 0.05)) +
-  # geom_point(aes(Antibiotic, exp(Estimate), colour=Region),
-  #                 position = position_dodge(0.5), size=1) +
-  geom_pointrange(aes(Antibiotic, exp(Estimate), ymin=exp(Estimate-std), ymax=exp(Estimate+std), colour=Region),
-             position = position_dodge(0.5), size=0.15) +
-  geom_hline(yintercept = 1, linetype="dashed", alpha=0.2) +
-  facet_grid(cols=vars(Pathogen), rows=vars(Source)) +
+results_all$cat_Estimate = cut(results_all$Estimate, breaks = c(0,50,100,200,9999),
+                               labels = c("0-50","50-100","100-200",">200"))
+
+pa=ggplot(results_all %>% filter(Value=="(Intercept)" & pval < 0.05), aes(x=Source, y=Antibiotic, fill = cat_Estimate)) +                           
+  geom_tile(color = "white")+
+  scale_fill_discrete(type = c('grey50', '#87CEEB', "#4682B4", '#003366'), 
+                      name = 'Intercept') + 
   theme_bw() +
-  theme(axis.text.x=element_text(angle=45, hjust=1),
-        legend.position = "bottom")
+  xlab("Sampling sources") +
+  ylab("Antibiotic class") +
+  facet_grid(cols=vars(Region), rows=vars(Pathogen)) +
+  geom_text(aes(label = round(Estimate, digits=0)), 
+            color = "white", fontface='bold', size = 3) +
+  theme(legend.position="bottom",
+        strip.text.y = element_text(size = 11, face = "italic"),
+        strip.text.x = element_text(size=11),
+        axis.text.x = element_text(size = 11, angle=45, hjust=1),
+        axis.text.y = element_text(size = 11),
+        axis.title = element_text(size = 12))
 
-ggsave("reg_by_reg_exp.png", height=6, width=7)
+results_all$cat_Estimate = cut(results_all$Estimate, breaks = c(0.5,0.9,1.1,1.2,1.4,9999),
+                               labels = c("0.5-0.9","0.9-1.1","1.1-1.2","1.2-1.4",">1.4"))
 
-ggplot(results_all %>% filter(Value=="(Intercept)" & pval < 0.05)) +
-  # geom_point(aes(Antibiotic, exp(Estimate), colour=Region),
-  #                 position = position_dodge(0.5), size=1) +
-  geom_pointrange(aes(Antibiotic, exp(Estimate), ymin=exp(Estimate-std), ymax=exp(Estimate+std), colour=Region),
-                  position = position_dodge(0.5), size=0.15) +
-  geom_hline(yintercept = 1, linetype="dashed", alpha=0.2) +
-  facet_grid(cols=vars(Pathogen), rows=vars(Source)) +
+pb=ggplot(results_all %>% filter(Value=="Resistant.x" & pval < 0.05), aes(x=Source, y=Antibiotic, fill = cat_Estimate)) +                           
+  geom_tile(color = "white")+
+  scale_fill_discrete(type = c("orange2", 'grey50', '#87CEEB', "#4682B4", '#003366'), 
+                      name = 'Regression coefficient') + 
   theme_bw() +
-  theme(axis.text.x=element_text(angle=45, hjust=1),
-        legend.position = "bottom")
+  xlab("Sampling sources") +
+  ylab("Antibiotic class") +
+  facet_grid(cols=vars(Region), rows=vars(Pathogen)) +
+  geom_text(aes(label = round(Estimate, digits=2)), 
+            color = "white", fontface='bold', size = 3) +
+  theme(legend.position="bottom",
+        strip.text.y = element_text(size = 11, face = "italic"),
+        strip.text.x = element_text(size=11),
+        axis.text.x = element_text(size = 11, angle=45, hjust=1),
+        axis.text.y = element_text(size = 11),
+        axis.title = element_text(size = 12))
 
-ggsave("reg_by_reg_exp_beta0.png", height=6, width=7)
+plot_grid(pa,pb, labels=c("a)", "b)"), hjust=0, nrow=2)
 
+ggsave(here("figures","fig3.png"), height=12, width=15)
 

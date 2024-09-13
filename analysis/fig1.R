@@ -5,7 +5,7 @@ library(cowplot)
 library(RColorBrewer)
 library(data.table)
 
-col_pal = brewer.pal(6, "Dark2")
+col_pal = brewer.pal(6, "Set1")[c(1,3)]
   
 df_AMR = read.csv(here::here("data", "final_AMR_dataset.csv")) %>%
   filter(Data != "GLASS") %>%
