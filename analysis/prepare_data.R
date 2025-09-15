@@ -187,6 +187,7 @@ years_of_interest = c() #c(2017:2020)
 #Bacterial species 
 # bacteria_of_interest = c()
 bacteria_of_interest = as.mo(c("E. coli", "K pneumoniae"))
+# bacteria_of_interest = as.mo("S. aureus")
 
 #Antibiotics tested
 #ESBL (3GC) and carbapenems (CBP)
@@ -198,6 +199,7 @@ antibiotics_of_interest = as.ab(c("ciprofloxacin", "levofloxacin", "ofloxacin",
                                   "trimethoprim-sulfamethoxazole", "sulfonamides", "ampicillin", "amoxicillin", "piperacillin", "mecillinam",
                                   "colistin"))
 # antibiotics_of_interest = c()
+# antibiotics_of_interest = as.ab("Oxacillin")
 
 ################################################################################
 ############### Get same variables for all AMR datasets ########################

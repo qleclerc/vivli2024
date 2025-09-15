@@ -6,7 +6,9 @@ library(RColorBrewer)
 library(data.table)
 
 col_pal = brewer.pal(6, "Set1")[c(1,3)]
-  
+dat=read.csv(here::here("data", "final_AMR_dataset.csv"))
+dat %>% group_by(Data, Year) %>% summarise(Total = sum(Total)) %>% View
+
 df_AMR = read.csv(here::here("data", "final_AMR_dataset.csv")) %>%
   filter(Data != "GLASS") %>%
   filter(!(Source %in% c("HEENT", "Reproduction", "Other"))) %>%
@@ -26,6 +28,9 @@ df_AMR_agg = df_AMR %>%
   mutate(prop = Resistant/Total) %>%
   ungroup
 
+ggplot(df_AMR_agg %>% group_by(Pathogen, Year, Source) %>% summarise(Total=sum(Total))) +
+  geom_line(aes(Year, Total, colour=Source)) +
+  facet_grid(cols = vars(Pathogen))
 
 df_AMR_all = df_AMR %>%
   group_by(Source, Pathogen, Antibiotic) %>%

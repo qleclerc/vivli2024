@@ -75,7 +75,7 @@ results_all$Estimate = exp(results_all$Estimate)
 results_all$cat_Estimate = cut(results_all$Estimate, breaks = c(0,50,100,200,9999),
                                labels = c("0-50","50-100","100-200",">200"))
 
-pa=ggplot(results_all %>% filter(Value=="(Intercept)" & pval < 0.05), aes(x=Source, y=Antibiotic, fill = cat_Estimate)) +                           
+pa=ggplot(results_all %>% filter(Value=="(Intercept)" & pval < 0.05 & Region %in% c("African Region", "European Region")), aes(x=Source, y=Antibiotic, fill = cat_Estimate)) +                           
   geom_tile(color = "white")+
   scale_fill_discrete(type = c('grey50', '#87CEEB', "#4682B4", '#003366'), 
                       name = 'Intercept') + 
@@ -95,7 +95,7 @@ pa=ggplot(results_all %>% filter(Value=="(Intercept)" & pval < 0.05), aes(x=Sour
 results_all$cat_Estimate = cut(results_all$Estimate, breaks = c(0.5,0.9,1.1,1.2,1.4,9999),
                                labels = c("0.5-0.9","0.9-1.1","1.1-1.2","1.2-1.4",">1.4"))
 
-pb=ggplot(results_all %>% filter(Value=="Resistant.x" & pval < 0.05), aes(x=Source, y=Antibiotic, fill = cat_Estimate)) +                           
+pb=ggplot(results_all %>% filter(Value=="Resistant.x" & pval < 0.05 & Region %in% c("African Region", "European Region")), aes(x=Source, y=Antibiotic, fill = cat_Estimate)) +                           
   geom_tile(color = "white")+
   scale_fill_discrete(type = c("orange2", 'grey50', '#87CEEB', "#4682B4", '#003366'), 
                       name = 'Regression coefficient') + 
@@ -114,5 +114,5 @@ pb=ggplot(results_all %>% filter(Value=="Resistant.x" & pval < 0.05), aes(x=Sour
 
 plot_grid(pa,pb, labels=c("a)", "b)"), hjust=0, nrow=2)
 
-ggsave(here("figures","fig3.png"), height=12, width=15)
+ggsave(here("figures","fig3alt.png"), height=11, width=7)
 
